@@ -2,6 +2,24 @@
    KIO CAPACITY DASHBOARD - SAME AS REFERENCE DESIGN
 ========================================================= */
 
+/* =========================================================
+   HIDE ODOO SEARCH BAR / PAGER ONLY FOR CAPACITY DASHBOARD
+========================================================= */
+
+.o_action_manager:has(.o_kio_capacity_dashboard) .o_control_panel .o_cp_searchview,
+.o_action_manager:has(.o_kio_capacity_dashboard) .o_control_panel .o_searchview,
+.o_action_manager:has(.o_kio_capacity_dashboard) .o_control_panel .o_search_panel,
+.o_action_manager:has(.o_kio_capacity_dashboard) .o_control_panel .o_pager,
+.o_action_manager:has(.o_kio_capacity_dashboard) .o_control_panel .o_cp_pager,
+.o_action_manager:has(.o_kio_capacity_dashboard) .o_control_panel .o_cp_bottom {
+    display: none !important;
+}
+
+.o_action_manager:has(.o_kio_capacity_dashboard) .o_control_panel {
+    min-height: 44px !important;
+    padding-bottom: 0 !important;
+}
+
 /* Odoo Kanban Full Width Fix */
 .o_kanban_renderer.o_kio_capacity_dashboard {
     display: block !important;
@@ -107,7 +125,7 @@
     font-size: 18px;
     font-weight: 650;
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
-    cursor: pointer;
+    cursor: default;
 }
 
 .o_kio_today_btn i {

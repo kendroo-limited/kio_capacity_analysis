@@ -189,7 +189,7 @@
         <field name="name">kio.capacity.dashboard.customer.tree</field>
         <field name="model">kio.capacity.dashboard.customer</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree create="false" edit="false">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="client_type"/>

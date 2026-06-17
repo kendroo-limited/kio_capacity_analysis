@@ -173,7 +173,7 @@
                                     <div class="o_kio_card_glow"></div>
                                     <div class="o_kio_card_header">
                                         <div class="o_kio_metric_icon">
-                                            <i class="fa fa-arrow-circle-up"/>
+                                            <i class="fa fa-level-up"/>
                                         </div>
                                         <div class="o_kio_status_badge">
                                             <span class="o_kio_status_dot success"></span>
@@ -202,7 +202,7 @@
                                     <div class="o_kio_card_glow"></div>
                                     <div class="o_kio_card_header">
                                         <div class="o_kio_metric_icon">
-                                            <i class="fa fa-arrow-circle-down"/>
+                                            <i class="fa fa-level-down"/>
                                         </div>
                                         <div class="o_kio_status_badge">
                                             <span class="o_kio_status_dot warning"></span>

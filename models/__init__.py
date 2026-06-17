@@ -1,3 +1,5 @@
 # -*- coding: utf-8 -*-
 
 from . import models
+from . import kio_capacity_dashboard_customer
+from . import kio_capacity_dashboard_customer_line

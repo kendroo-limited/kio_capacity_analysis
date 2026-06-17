@@ -12,6 +12,7 @@
         'security/ir.model.access.csv',
         'data/capacity_dashboard_data.xml',
         'views/views.xml',
+        # 'views/kio_capacity_dashboard_views.xml',
     ],
     'assets': {
         'web.assets_backend': [

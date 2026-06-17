@@ -51,7 +51,7 @@
                                 <div class="o_kio_metric_card o_kio_metric_total">
                                     <div class="o_kio_top_line"></div>
                                     <div class="o_kio_card_glow"></div>
-                                    
+
                                     <div class="o_kio_card_header">
                                         <div class="o_kio_metric_icon">
                                             <i class="fa fa-database"/>
@@ -80,7 +80,7 @@
                                 <div class="o_kio_metric_card o_kio_metric_bandwidth">
                                     <div class="o_kio_top_line"></div>
                                     <div class="o_kio_card_glow"></div>
-                                    
+
                                     <div class="o_kio_card_header">
                                         <div class="o_kio_metric_icon">
                                             <i class="fa fa-wifi"/>
@@ -109,7 +109,7 @@
                                 <div class="o_kio_metric_card o_kio_metric_mac">
                                     <div class="o_kio_top_line"></div>
                                     <div class="o_kio_card_glow"></div>
-                                    
+
                                     <div class="o_kio_card_header">
                                         <div class="o_kio_metric_icon">
                                             <i class="fa fa-server"/>
@@ -138,7 +138,7 @@
                                 <div class="o_kio_metric_card o_kio_metric_free">
                                     <div class="o_kio_top_line"></div>
                                     <div class="o_kio_card_glow"></div>
-                                    
+
                                     <div class="o_kio_card_header">
                                         <div class="o_kio_metric_icon">
                                             <i class="fa fa-check-circle"/>
@@ -164,7 +164,7 @@
                                 </div>
 
                             </div>
-                            
+
 
                         </div>
                     </t>

@@ -302,6 +302,7 @@
     <!-- Menu -->
     <menuitem id="menu_kio_capacity_root"
               name="Capacity Analysis"
+              web_icon="kio_capacity_analysis,static/description/icon.png"
               sequence="10"/>
 
     <menuitem id="menu_kio_capacity_dashboard"

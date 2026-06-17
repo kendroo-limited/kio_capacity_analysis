@@ -36,12 +36,14 @@ class KioCapacityDashboard(models.Model):
 
     upgrade_capacity = fields.Float(
         string="Upgrade Capacity",
-        default=0.0,
+        compute="_compute_realtime_capacity",
+        store=False,
     )
 
     downgrade_capacity = fields.Float(
         string="Downgrade Capacity",
-        default=0.0,
+        compute="_compute_realtime_capacity",
+        store=False,
     )
 
     customer_line_ids = fields.One2many(
@@ -76,6 +78,28 @@ class KioCapacityDashboard(models.Model):
 
         return capacity
 
+
+    def _get_change_request_capacity_totals(self):
+        ChangeRequest = self.env["isp.portal.change.request"].sudo()
+        requests = ChangeRequest.search([
+            ("request_type", "in", ["upgrade", "downgrade"]),
+            ("client_id.active", "=", True),
+            ("client_id.client_type", "=", "bandwith"),
+        ])
+
+        upgrade_capacity = 0.0
+        downgrade_capacity = 0.0
+        for request in requests:
+            current_capacity = request.current_capacity_total or request.current_capacity or 0.0
+            requested_capacity = request.requested_capacity_total or request.requested_capacity or 0.0
+
+            if request.request_type == "upgrade":
+                upgrade_capacity += max(requested_capacity - current_capacity, 0.0)
+            elif request.request_type == "downgrade":
+                downgrade_capacity += max(current_capacity - requested_capacity, 0.0)
+
+        return upgrade_capacity, downgrade_capacity
+
     @api.depends_context("uid")
     def _compute_realtime_capacity(self):
         Client = self.env["isp.client"].sudo()
@@ -92,12 +116,16 @@ class KioCapacityDashboard(models.Model):
             for line in client.offer_capacity_type_ids:
                 bandwidth_capacity += self._get_capacity_in_mbps_from_offer_line(line)
 
+        upgrade_capacity, downgrade_capacity = self._get_change_request_capacity_totals()
+
         mac_capacity = 0.0
         free_capacity = 0.0
 
         for dashboard in self:
             dashboard.bandwidth_capacity = bandwidth_capacity
             dashboard.mac_capacity = mac_capacity
+            dashboard.upgrade_capacity = upgrade_capacity
+            dashboard.downgrade_capacity = downgrade_capacity
             dashboard.total_capacity = bandwidth_capacity + mac_capacity
             dashboard.free_capacity = free_capacity
 

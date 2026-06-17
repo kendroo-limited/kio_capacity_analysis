@@ -188,8 +188,13 @@
 .o_kio_metric_card {
     position: relative;
     display: block;
+    width: 100%;
     color: inherit;
+    text-align: left;
     text-decoration: none;
+    font: inherit;
+    cursor: pointer;
+    appearance: none;
     padding: 28px 26px 22px 26px;
     border-radius: 16px;
     background: #ffffff;

@@ -168,7 +168,8 @@
                                 </div>
 
                                 <!-- 5. Upgrade Capacity -->
-                                <div class="o_kio_metric_card o_kio_metric_upgrade">
+                                <a type="object" name="action_open_upgrade_requests"
+                                   class="o_kio_metric_card o_kio_metric_upgrade o_kanban_action">
                                     <div class="o_kio_top_line"></div>
                                     <div class="o_kio_card_glow"></div>
                                     <div class="o_kio_card_header">
@@ -194,10 +195,11 @@
                                         </span>
                                         <span class="o_kio_updated">Updated now</span>
                                     </div>
-                                </div>
+                                </a>
 
                                 <!-- 6. Downgrade Capacity -->
-                                <div class="o_kio_metric_card o_kio_metric_downgrade">
+                                <a type="object" name="action_open_downgrade_requests"
+                                   class="o_kio_metric_card o_kio_metric_downgrade o_kanban_action">
                                     <div class="o_kio_top_line"></div>
                                     <div class="o_kio_card_glow"></div>
                                     <div class="o_kio_card_header">
@@ -223,7 +225,7 @@
                                         </span>
                                         <span class="o_kio_updated">Updated now</span>
                                     </div>
-                                </div>
+                                </a>
 
                             </div>
                         </div>

@@ -129,6 +129,46 @@ class KioCapacityDashboard(models.Model):
             dashboard.total_capacity = bandwidth_capacity + mac_capacity
             dashboard.free_capacity = free_capacity
 
+
+    def action_open_upgrade_requests(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Upgrade Capacity Requests",
+            "res_model": "isp.portal.change.request",
+            "view_mode": "tree,form",
+            "domain": [
+                ("request_type", "=", "upgrade"),
+                ("client_id.active", "=", True),
+                ("client_id.client_type", "=", "bandwith"),
+            ],
+            "context": {
+                "create": False,
+                "edit": False,
+            },
+            "target": "current",
+        }
+
+
+    def action_open_downgrade_requests(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Downgrade Capacity Requests",
+            "res_model": "isp.portal.change.request",
+            "view_mode": "tree,form",
+            "domain": [
+                ("request_type", "=", "downgrade"),
+                ("client_id.active", "=", True),
+                ("client_id.client_type", "=", "bandwith"),
+            ],
+            "context": {
+                "create": False,
+                "edit": False,
+            },
+            "target": "current",
+        }
+
     def action_open_bandwidth_customers(self):
         self.ensure_one()
 

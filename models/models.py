@@ -106,15 +106,15 @@ class KioCapacityDashboard(models.Model):
 
         return {
             "type": "ir.actions.act_window",
-            "name": "Bandwidth Customers",
-            "res_model": "kio.capacity.dashboard.customer",
+            "name": "Active Bandwidth Customers",
+            "res_model": "isp.client",
             "view_mode": "tree,form",
             "domain": [
-                ("dashboard_id", "=", self.id),
+                ("active", "=", True),
                 ("client_type", "=", "bandwith"),
+                ("pipeline_state", "=", "noc_confirm"),
             ],
             "context": {
-                "default_dashboard_id": self.id,
                 "default_client_type": "bandwith",
             },
             "target": "current",

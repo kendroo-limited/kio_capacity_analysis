@@ -206,7 +206,7 @@
         <field name="name">kio.capacity.dashboard.customer.form</field>
         <field name="model">kio.capacity.dashboard.customer</field>
         <field name="arch" type="xml">
-            <form string="Customer Capacity Details">
+            <form string="Customer Capacity Details" create="false" edit="false">
                 <sheet>
                     <group>
                         <group>

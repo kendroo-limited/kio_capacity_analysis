@@ -65,17 +65,42 @@
         <field name="name">kio.capacity.upstream.purchase.tree</field>
         <field name="model">kio.capacity.upstream.purchase</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree string="Upstream Purchases" default_order="purchase_date desc, reference desc">
                 <field name="sequence" widget="handle"/>
                 <field name="reference" readonly="1"/>
                 <field name="provider_id"/>
-                <field name="responsible_user_id"/>
-                <field name="capacity_item" readonly="1"/>
-                <field name="purchased_capacity" sum="Total Mbps" readonly="1"/>
-                <field name="price" sum="Total Price" readonly="1"/>
+                <field name="responsible_user_id" widget="many2one_avatar_user"/>
                 <field name="purchase_date"/>
-                <field name="active"/>
+                <field name="capacity_item" readonly="1"/>
+                <field name="purchased_capacity" sum="Total Capacity (Mbps)" readonly="1"/>
+                <field name="price" sum="Total Price" readonly="1"/>
+                <field name="active" widget="boolean_toggle"/>
             </tree>
+        </field>
+    </record>
+
+
+    <record id="view_kio_capacity_upstream_purchase_search" model="ir.ui.view">
+        <field name="name">kio.capacity.upstream.purchase.search</field>
+        <field name="model">kio.capacity.upstream.purchase</field>
+        <field name="arch" type="xml">
+            <search string="Search Upstream Purchases">
+                <field name="reference"/>
+                <field name="provider_id"/>
+                <field name="responsible_user_id"/>
+                <field name="capacity_item"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <filter string="My Purchases" name="my_purchases" domain="[('responsible_user_id', '=', uid)]"/>
+                <filter string="This Month" name="this_month" date="purchase_date" default_period="this_month"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Provider" name="group_provider" context="{'group_by': 'provider_id'}"/>
+                    <filter string="Responsible Person" name="group_responsible" context="{'group_by': 'responsible_user_id'}"/>
+                    <filter string="Purchase Date" name="group_purchase_date" context="{'group_by': 'purchase_date'}"/>
+                    <filter string="Active Status" name="group_active" context="{'group_by': 'active'}"/>
+                </group>
+            </search>
         </field>
     </record>
 
@@ -117,10 +142,9 @@
                         </page>
                     </notebook>
 
-                    <group class="oe_subtotal_footer oe_right" colspan="2">
-                        <field name="capacity_item" readonly="1"/>
-                        <field name="purchased_capacity" readonly="1"/>
-                        <field name="price" readonly="1"/>
+                    <group class="oe_subtotal_footer oe_right" colspan="2" string="Totals">
+                        <field name="purchased_capacity" readonly="1" string="Total Capacity (Mbps)"/>
+                        <field name="price" readonly="1" string="Total Price"/>
                     </group>
                 </sheet>
                 <div class="oe_chatter">
@@ -136,7 +160,8 @@
         <field name="name">Total Upstream Capacity</field>
         <field name="res_model">kio.capacity.upstream.purchase</field>
         <field name="view_mode">kanban,tree,form</field>
-        <field name="context">{'group_by': 'provider_id'}</field>
+        <field name="search_view_id" ref="view_kio_capacity_upstream_purchase_search"/>
+        <field name="context">{'search_default_active': 1, 'active_test': False, 'group_by': 'provider_id'}</field>
     </record>
 
     <menuitem id="menu_kio_capacity_upstream_purchase"

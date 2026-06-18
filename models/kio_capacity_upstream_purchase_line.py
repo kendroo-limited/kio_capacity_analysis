@@ -44,7 +44,7 @@ class KioCapacityUpstreamPurchaseLine(models.Model):
     @api.constrains("purchased_capacity", "price")
     def _check_positive_values(self):
         for record in self:
-            if record.purchased_capacity < 0:
-                raise ValidationError("Purchased Capacity (Mbps) cannot be negative.")
-            if record.price < 0:
-                raise ValidationError("Price cannot be negative.")
+            if record.purchased_capacity <= 0:
+                raise ValidationError("Capacity (Mbps) must be greater than zero.")
+            if record.price <= 0:
+                raise ValidationError("Price must be greater than zero.")

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class KioCapacityUpstreamPurchase(models.Model):
@@ -102,3 +103,9 @@ class KioCapacityUpstreamPurchase(models.Model):
                 item,
                 capacity,
             )
+
+    @api.constrains("line_ids")
+    def _check_lines_not_empty(self):
+        for record in self:
+            if not record.line_ids:
+                raise ValidationError("At least one Capacity Item line is required.")

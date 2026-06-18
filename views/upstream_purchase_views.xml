@@ -133,7 +133,7 @@
                             <field name="line_ids" nolabel="1">
                                 <tree editable="bottom">
                                     <field name="sequence" widget="handle"/>
-                                    <field name="capacity_item_id"/>
+                                    <field name="capacity_item_id" />
                                     <field name="purchased_capacity" sum="Total Mbps"/>
                                     <field name="price"/>
                                     <field name="total_price" sum="Total Price" readonly="1"/>

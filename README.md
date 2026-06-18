@@ -1,216 +1,172 @@
-# Kio Capacity Analysis
+# KIO Capacity Analysis
 
-## Overview
+KIO Capacity Analysis is an Odoo 17 module for monitoring ISP capacity usage and upstream capacity purchases. It provides a kanban-style capacity overview, upstream purchase tracking, capacity item configuration, and an OWL client action dashboard that groups upstream purchases by provider.
 
-**Kio Capacity Analysis** is an Odoo-based network capacity monitoring and management module designed for ISP and enterprise network environments. The system provides a centralized dashboard to analyze and monitor network resource utilization, including total capacity, bandwidth capacity, MAC capacity, and available free capacity.
+## Module Information
 
-The module helps network administrators make informed decisions regarding capacity planning, resource allocation, network expansion, and performance optimization.
+| Item | Value |
+| --- | --- |
+| Technical name | `kio_capacity_analysis` |
+| Odoo version | 17.0 |
+| Category | Operations |
+| Version | 17.0.1.0.0 |
+| Dependencies | `base`, `web`, `mail` |
 
----
+## Main Features
 
-## Features
+### Capacity Overview Dashboard
 
-### Capacity Dashboard
+The main dashboard is available from **Capacity Analysis > Dashboard**. It is backed by the `kio.capacity.dashboard` model and displays live capacity metrics:
 
-The dashboard provides a real-time overview of network resources:
+- Total Upstream Capacity
+- Total Downstream Capacity
+- Free Capacity
+- Bandwidth Capacity
+- MAC Capacity
+- Upgrade Capacity
+- Downgrade Capacity
 
-* **Total Capacity**
+The **Total Upstream Capacity** card shows the dynamic `total_upstream_capacity` value. Clicking this card opens the OWL Provider Capacity Dashboard client action.
 
-  * Displays overall network capacity.
-  * Aggregated from all configured capacity sources.
+### Dynamic Upstream Capacity Calculation
 
-* **Bandwidth Capacity**
+`total_upstream_capacity` is computed from `kio.capacity.upstream.purchase.line` records.
 
-  * Shows available bandwidth resources.
-  * Helps monitor bandwidth utilization trends.
+- Sums `purchased_capacity`
+- Includes only lines whose parent upstream purchase is active
+- Uses non-stored computation for fresh dashboard values on read/refresh
+- Reflects upstream purchase line changes after dashboard reload
 
-* **MAC Capacity**
+### Upstream Purchase Management
 
-  * Tracks MAC address allocation and usage.
-  * Supports network resource management.
+The module adds the `kio.capacity.upstream.purchase` model for recording purchased upstream capacity by provider.
 
-* **Free Capacity**
+Key fields:
 
-  * Displays remaining available capacity.
-  * Assists in planning future customer provisioning.
+- `reference`: sequence-generated purchase reference
+- `provider_id`: upstream provider
+- `responsible_user_id`: responsible user
+- `purchase_date`: purchase date
+- `active`: archive status
+- `line_ids`: purchased capacity item lines
+- `purchased_capacity`: computed total Mbps from lines
+- `price`: computed total price from lines
 
----
+Each purchase line uses `kio.capacity.upstream.purchase.line` and stores:
 
-### Search & Filtering
+- Capacity item
+- Purchased capacity in Mbps
+- Unit price
+- Computed total price
 
-* Global search functionality.
-* Quick access to capacity records.
-* Easy navigation across capacity data.
+### Provider Capacity Dashboard
 
----
+The OWL client action dashboard is registered with:
 
-### Capacity Monitoring
-
-The module continuously tracks:
-
-* Network capacity allocation
-* Customer bandwidth assignments
-* Resource consumption
-* Available network resources
-
----
-
-### Performance Analysis
-
-Administrators can:
-
-* Monitor resource utilization
-* Identify capacity bottlenecks
-* Analyze network growth trends
-* Forecast future capacity requirements
-
----
-
-## Business Benefits
-
-### Improved Capacity Planning
-
-* Prevent resource shortages
-* Optimize infrastructure investments
-* Support network expansion planning
-
-### Better Resource Utilization
-
-* Reduce unused capacity
-* Improve network efficiency
-* Maintain service quality
-
-### Operational Visibility
-
-* Real-time network insights
-* Centralized capacity management
-* Simplified monitoring process
-
----
-
-## Dashboard Components
-
-| Metric             | Description                       |
-| ------------------ | --------------------------------- |
-| Total Capacity     | Total network resource capacity   |
-| Bandwidth Capacity | Available bandwidth resources     |
-| MAC Capacity       | Available MAC resource allocation |
-| Free Capacity      | Remaining unused capacity         |
-
----
-
-## Typical Workflow
-
-### 1. Capacity Configuration
-
-```
-Network Resources
-        ↓
-Capacity Records
-        ↓
-Dashboard Calculation
+```xml
+<record id="action_kio_capacity_client_dashboard" model="ir.actions.client">
+    <field name="name">Provider Capacity Dashboard</field>
+    <field name="tag">kio_capacity_analysis.capacity_dashboard</field>
+</record>
 ```
 
-### 2. Monitoring Process
+The dashboard component:
 
-```
-Capacity Allocation
-        ↓
-Resource Consumption
-        ↓
-Capacity Analysis
-        ↓
-Dashboard Update
-```
+- Uses Odoo 17 OWL conventions
+- Fetches `kio.capacity.upstream.purchase` records with `orm.searchRead`
+- Includes active and inactive records with `active_test: false`
+- Groups records by `provider_id` in JavaScript
+- Shows total active capacity, total spend, and total providers
+- Renders one card per provider
+- Displays provider capacity, total price, and active count versus total count
+- Opens filtered upstream purchase tree/form views from each provider card
 
-### 3. Planning Process
+### Capacity Items
 
-```
-Current Capacity
-        ↓
-Usage Analysis
-        ↓
-Growth Forecast
-        ↓
-Expansion Decision
-```
+Capacity item configuration is available under **Capacity Analysis > Configuration > Capacity Items**.
 
----
+The `kio.capacity.item` model is used to classify upstream purchase line capacity entries.
 
-## User Roles
+### Sequence
 
-### Administrator
+Upstream purchase references use the `kio.capacity.upstream.purchase` sequence.
 
-* Configure capacity resources
-* Manage capacity records
-* Monitor network utilization
-* Generate analysis reports
-
-### Network Operations Team
-
-* View dashboard metrics
-* Monitor resource consumption
-* Analyze capacity trends
-
----
-
-## Technical Information
-
-### Module Name
-
-```python
-kio_capacity_analysis
-```
-
-### Platform
-
-* Odoo 17/18/19 Compatible
-* PostgreSQL Database
-* Python Framework
-
-### Dependencies
-
-```python
-base
-mail
-web
-```
-
-*(Additional dependencies may vary based on implementation.)*
-
----
-
-## Dashboard Preview
-
-The Capacity Dashboard displays:
-
-* Total Capacity Card
-* Bandwidth Capacity Card
-* MAC Capacity Card
-* Free Capacity Card
-* Search Bar
-* Capacity Analysis Workspace
-
----
-
-## Developed By
-
-**Kendroo Limited**
-
-Website: [https://kendroo.com](https://kendroo.com)
-
----
-
-## Version
+Current format:
 
 ```text
-Version: 1.0.0
+UPC/%(year)s/00001
 ```
+
+Example:
+
+```text
+UPC/2026/00001
+```
+
+## Navigation
+
+| Menu | Purpose |
+| --- | --- |
+| Capacity Analysis > Dashboard | Main capacity overview dashboard |
+| Total Upstream Capacity card | Opens the OWL Provider Capacity Dashboard |
+| Capacity Analysis > Configuration > Capacity Items | Manage capacity item records |
+
+The upstream purchase action is also defined with kanban, tree, and form views. The kanban view groups records by `provider_id`.
+
+## Technical Components
+
+### Python Models
+
+| Model | Purpose |
+| --- | --- |
+| `kio.capacity.dashboard` | Main computed capacity dashboard |
+| `kio.capacity.dashboard.customer` | Customer capacity detail records |
+| `kio.capacity.dashboard.customer.line` | Customer offer capacity detail lines |
+| `kio.capacity.upstream.purchase` | Upstream provider purchase header |
+| `kio.capacity.upstream.purchase.line` | Upstream purchase capacity lines |
+| `kio.capacity.item` | Capacity item configuration |
+
+### Views and Actions
+
+| File | Contents |
+| --- | --- |
+| `views/views.xml` | Main capacity dashboard kanban, dashboard action, root menu |
+| `views/upstream_purchase_views.xml` | Upstream purchase views, capacity item views, upstream purchase action |
+| `views/capacity_dashboard_views.xml` | OWL client action for Provider Capacity Dashboard |
+
+### Web Assets
+
+| File | Purpose |
+| --- | --- |
+| `static/src/js/capacity_dashboard.js` | OWL component and action registry entry |
+| `static/src/xml/capacity_dashboard.xml` | OWL dashboard template |
+| `static/src/scss/capacity_dashboard.scss` | Dashboard styling |
+
+### Data and Security
+
+| File | Purpose |
+| --- | --- |
+| `data/capacity_dashboard_data.xml` | Initial dashboard record |
+| `data/upstream_purchase_sequence.xml` | Upstream purchase sequence |
+| `security/ir.model.access.csv` | Access rules for dashboard, purchase, line, and item models |
+
+## Installation
+
+1. Copy the module to an Odoo 17 addons path.
+2. Update the Odoo app list.
+3. Install **KIO Capacity Analysis**.
+4. Open **Capacity Analysis > Dashboard**.
+
+## Upgrade Notes
+
+After changing assets or XML files, upgrade the module and refresh Odoo backend assets.
+
+For sequence prefix changes, note that `data/upstream_purchase_sequence.xml` uses `noupdate="1"`. Existing databases may not receive sequence updates automatically during module upgrade. Update the sequence manually from Odoo technical settings if needed.
+
+## Access Rights
+
+Base internal users can read the dashboard and manage upstream purchase, upstream purchase line, capacity item, and customer capacity records according to `security/ir.model.access.csv`.
 
 ## License
 
-```text
 LGPL-3
-```
-
-A comprehensive network capacity analysis solution for efficient ISP and enterprise network resource management.

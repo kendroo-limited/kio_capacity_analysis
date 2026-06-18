@@ -2,11 +2,12 @@
 <templates xml:space="preserve">
     <t t-name="kio_capacity_analysis.CapacityDashboard">
         <div class="o_kio_capacity_client_dashboard p-4">
-            <div class="d-flex align-items-center justify-content-between mb-4">
-                <div>
-                    <h2 class="mb-1">Upstream Capacity Dashboard</h2>
-                    <div class="text-muted">Upstream capacity grouped by provider</div>
-                </div>
+            <div class="position-relative mb-4 text-center">
+                <button type="button" class="btn btn-primary position-absolute start-0 top-50 translate-middle-y" t-on-click="() => this.openUpstreamPurchaseForm()">
+                    Create
+                </button>
+                <h2 class="mb-1">Upstream Capacity Dashboard</h2>
+                <div class="text-muted">Upstream capacity grouped by provider</div>
             </div>
 
             <t t-if="state.loading">

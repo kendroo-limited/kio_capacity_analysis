@@ -107,6 +107,18 @@ export class KioCapacityDashboard extends Component {
             target: "current",
         });
     }
+    openUpstreamPurchaseForm() {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            name: "Upstream Capacity Purchase",
+            res_model: "kio.capacity.upstream.purchase",
+            views: [[false, "form"]],
+            view_mode: "form",
+            target: "current",
+            context: { active_test: false },
+        });
+    }
+
 }
 
 KioCapacityDashboard.template = "kio_capacity_analysis.CapacityDashboard";

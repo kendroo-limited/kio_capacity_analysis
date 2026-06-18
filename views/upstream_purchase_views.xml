@@ -213,11 +213,11 @@
         <field name="context">{'search_default_active': 1, 'active_test': False, 'group_by': 'provider_id'}</field>
     </record>
 
-    <menuitem id="menu_kio_capacity_upstream_purchase"
+    <!-- <menuitem id="menu_kio_capacity_upstream_purchase"
               name="Upstream Purchases"
               parent="menu_kio_capacity_root"
               action="action_kio_capacity_upstream_purchase"
-              sequence="20"/>
+              sequence="20"/> -->
 
     <menuitem id="menu_kio_capacity_configuration"
               name="Configuration"

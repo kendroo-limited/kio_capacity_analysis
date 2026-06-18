@@ -6,11 +6,12 @@
         <field name="model">kio.capacity.dashboard</field>
         <field name="arch" type="xml">
             <kanban class="o_kio_capacity_dashboard" create="false" edit="false" delete="false">
+<!--                <field name="total_upstream_capacity"/>-->
                 <field name="total_capacity"/>
+                <field name="free_capacity"/>
                 <field name="bandwidth_capacity"/>
                 <field name="mac_capacity"/>
-                <field name="free_capacity"/>
-                <!-- New Fields -->
+<!--                <field name="nttn_capacity"/>-->
                 <field name="upgrade_capacity"/>
                 <field name="downgrade_capacity"/>
                 <field name="write_date"/>
@@ -19,18 +20,17 @@
                     <t t-name="kanban-box">
                         <div class="o_kio_dashboard_wrapper">
 
-                            <!-- ===== HEADER ===== -->
                             <div class="o_kio_dashboard_header">
                                 <div>
                                     <div class="o_kio_breadcrumb">
-                                        <span>🏠 Home</span>
+                                        <span>Home</span>
                                         <i class="fa fa-chevron-right"/>
                                         <span>Capacity Analysis</span>
                                         <i class="fa fa-chevron-right"/>
-                                        <span class="o_kio_breadcrumb_current">📊 Dashboard</span>
+                                        <span class="o_kio_breadcrumb_current">Dashboard</span>
                                     </div>
 
-                                    <h1 class="o_kio_dashboard_title">⚡ Capacity Overview</h1>
+                                    <h1 class="o_kio_dashboard_title">Capacity Overview</h1>
                                     <p class="o_kio_dashboard_subtitle">
                                         Real-time resource utilization and capacity metrics
                                     </p>
@@ -47,39 +47,75 @@
                                 </div>
                             </div>
 
-                            <!-- ===== METRIC CARDS GRID ===== -->
                             <div class="o_kio_dashboard_grid">
 
-                                <!-- 1. Total Capacity -->
+                                <!-- 1. Total Upstream Capacity -->
                                 <div class="o_kio_metric_card o_kio_metric_total">
                                     <div class="o_kio_top_line"></div>
                                     <div class="o_kio_card_glow"></div>
                                     <div class="o_kio_card_header">
                                         <div class="o_kio_metric_icon">
-                                            <i class="fa fa-database"/>
+                                            <i class="fa fa-upload"/>
                                         </div>
                                         <div class="o_kio_status_badge">
                                             <span class="o_kio_status_dot active"></span>
                                             Active
                                         </div>
                                     </div>
-                                    <div class="o_kio_metric_label">Total Capacity</div>
+                                    <div class="o_kio_metric_label">Total Upstream Capacity</div>
+                                    <div class="o_kio_metric_value">
+                                        <span class="o_kio_number">
+<!--                                            <field name="total_upstream_capacity"/>-->
+                                        </span>
+                                        <span class="o_kio_metric_unit">Mbps</span>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Total Downstream Capacity -->
+                                <div class="o_kio_metric_card o_kio_metric_total">
+                                    <div class="o_kio_top_line"></div>
+                                    <div class="o_kio_card_glow"></div>
+                                    <div class="o_kio_card_header">
+                                        <div class="o_kio_metric_icon">
+                                            <i class="fa fa-download"/>
+                                        </div>
+                                        <div class="o_kio_status_badge">
+                                            <span class="o_kio_status_dot active"></span>
+                                            Active
+                                        </div>
+                                    </div>
+                                    <div class="o_kio_metric_label">Total Downstream Capacity</div>
                                     <div class="o_kio_metric_value">
                                         <span class="o_kio_number">
                                             <field name="total_capacity"/>
                                         </span>
                                         <span class="o_kio_metric_unit">Mbps</span>
                                     </div>
-                                    <div class="o_kio_metric_footer">
-                                        <span class="o_kio_trend_up">
-                                            <i class="fa fa-arrow-up"/>
-                                            +12%
+                                </div>
+
+                                <!-- 3. Free Capacity -->
+                                <div class="o_kio_metric_card o_kio_metric_free">
+                                    <div class="o_kio_top_line"></div>
+                                    <div class="o_kio_card_glow"></div>
+                                    <div class="o_kio_card_header">
+                                        <div class="o_kio_metric_icon">
+                                            <i class="fa fa-check-circle"/>
+                                        </div>
+                                        <div class="o_kio_status_badge">
+                                            <span class="o_kio_status_dot active"></span>
+                                            Available
+                                        </div>
+                                    </div>
+                                    <div class="o_kio_metric_label">Free Capacity</div>
+                                    <div class="o_kio_metric_value">
+                                        <span class="o_kio_number">
+                                            <field name="free_capacity"/>
                                         </span>
-                                        <span class="o_kio_updated">Updated now</span>
+                                        <span class="o_kio_metric_unit">Mbps</span>
                                     </div>
                                 </div>
 
-                                <!-- 2. Bandwidth Capacity -->
+                                <!-- 4. Bandwidth Capacity -->
                                 <a type="object" name="action_open_bandwidth_customers"
                                    class="o_kio_metric_card o_kio_metric_bandwidth o_kanban_action">
                                     <div class="o_kio_top_line"></div>
@@ -100,16 +136,9 @@
                                         </span>
                                         <span class="o_kio_metric_unit">Mbps</span>
                                     </div>
-                                    <div class="o_kio_metric_footer">
-                                        <span class="o_kio_trend_stable">
-                                            <i class="fa fa-minus"/>
-                                            Stable
-                                        </span>
-                                        <span class="o_kio_updated">Updated now</span>
-                                    </div>
                                 </a>
 
-                                <!-- 3. MAC Capacity -->
+                                <!-- 5. MAC Capacity -->
                                 <div class="o_kio_metric_card o_kio_metric_mac">
                                     <div class="o_kio_top_line"></div>
                                     <div class="o_kio_card_glow"></div>
@@ -129,104 +158,29 @@
                                         </span>
                                         <span class="o_kio_metric_unit">Units</span>
                                     </div>
-                                    <div class="o_kio_metric_footer">
-                                        <span class="o_kio_trend_up">
-                                            <i class="fa fa-arrow-up"/>
-                                            +8%
-                                        </span>
-                                        <span class="o_kio_updated">Updated now</span>
-                                    </div>
                                 </div>
 
-                                <!-- 4. Free Capacity -->
-                                <div class="o_kio_metric_card o_kio_metric_free">
+                                <!-- 6. NTTN Capacity -->
+                                <div class="o_kio_metric_card o_kio_metric_nttn">
                                     <div class="o_kio_top_line"></div>
                                     <div class="o_kio_card_glow"></div>
                                     <div class="o_kio_card_header">
                                         <div class="o_kio_metric_icon">
-                                            <i class="fa fa-check-circle"/>
+                                            <i class="fa-solid fa-sitemap"/>
                                         </div>
                                         <div class="o_kio_status_badge">
-                                            <span class="o_kio_status_dot active"></span>
-                                            Available
+                                            <span class="o_kio_status_dot stable"></span>
+                                            Active
                                         </div>
                                     </div>
-                                    <div class="o_kio_metric_label">Free Capacity</div>
+                                    <div class="o_kio_metric_label">NTTN Capacity</div>
                                     <div class="o_kio_metric_value">
                                         <span class="o_kio_number">
-                                            <field name="free_capacity"/>
+<!--                                            <field name="nttn_capacity"/>-->
                                         </span>
                                         <span class="o_kio_metric_unit">Mbps</span>
-                                    </div>
-                                    <div class="o_kio_metric_footer">
-                                        <span class="o_kio_trend_up">
-                                            <i class="fa fa-arrow-up"/>
-                                            +5%
-                                        </span>
-                                        <span class="o_kio_updated">Updated now</span>
                                     </div>
                                 </div>
-
-                                <!-- 5. Upgrade Capacity -->
-                                <a type="object" name="action_open_upgrade_requests"
-                                   class="o_kio_metric_card o_kio_metric_upgrade o_kanban_action">
-                                    <div class="o_kio_top_line"></div>
-                                    <div class="o_kio_card_glow"></div>
-                                    <div class="o_kio_card_header">
-                                        <div class="o_kio_metric_icon">
-                                            <i class="fa fa-level-up"/>
-                                        </div>
-                                        <div class="o_kio_status_badge">
-                                            <span class="o_kio_status_dot success"></span>
-                                            Recommended
-                                        </div>
-                                    </div>
-                                    <div class="o_kio_metric_label">Upgrade Capacity</div>
-                                    <div class="o_kio_metric_value">
-                                        <span class="o_kio_number">
-                                            <field name="upgrade_capacity"/>
-                                        </span>
-                                        <span class="o_kio_metric_unit">Mbps</span>
-                                    </div>
-                                    <div class="o_kio_metric_footer">
-                                        <span class="o_kio_trend_up">
-                                            <i class="fa fa-arrow-up"/>
-                                            +15%
-                                        </span>
-                                        <span class="o_kio_updated">Updated now</span>
-                                    </div>
-                                </a>
-
-                                <!-- 6. Downgrade Capacity -->
-                                <a type="object" name="action_open_downgrade_requests"
-                                   class="o_kio_metric_card o_kio_metric_downgrade o_kanban_action">
-                                    <div class="o_kio_top_line"></div>
-                                    <div class="o_kio_card_glow"></div>
-                                    <div class="o_kio_card_header">
-                                        <div class="o_kio_metric_icon">
-                                            <i class="fa fa-level-down"/>
-                                        </div>
-                                        <div class="o_kio_status_badge">
-                                            <span class="o_kio_status_dot warning"></span>
-                                            Optimization
-                                        </div>
-                                    </div>
-                                    <div class="o_kio_metric_label">Downgrade Capacity</div>
-                                    <div class="o_kio_metric_value">
-                                        <span class="o_kio_number">
-                                            <field name="downgrade_capacity"/>
-                                        </span>
-                                        <span class="o_kio_metric_unit">Mbps</span>
-                                    </div>
-                                    <div class="o_kio_metric_footer">
-                                        <span class="o_kio_trend_down">
-                                            <i class="fa fa-arrow-down"/>
-                                            -8%
-                                        </span>
-                                        <span class="o_kio_updated">Updated now</span>
-                                    </div>
-                                </a>
-
                             </div>
                         </div>
                     </t>
@@ -235,7 +189,6 @@
         </field>
     </record>
 
-    <!-- Action with Search View Disabled -->
     <record id="action_kio_capacity_dashboard" model="ir.actions.act_window">
         <field name="name">Capacity Dashboard</field>
         <field name="res_model">kio.capacity.dashboard</field>
@@ -299,7 +252,6 @@
         </field>
     </record>
 
-    <!-- Menu -->
     <menuitem id="menu_kio_capacity_root"
               name="Capacity Analysis"
               web_icon="kio_capacity_analysis,static/description/icon.png"

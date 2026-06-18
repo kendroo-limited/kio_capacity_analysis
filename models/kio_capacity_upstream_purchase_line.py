@@ -22,7 +22,7 @@ class KioCapacityUpstreamPurchaseLine(models.Model):
         required=True,
     )
     purchased_capacity = fields.Float(
-        string="Purchased Capacity (Mbps)",
+        string="Capacity (Mbps)",
         required=True,
         default=0.0,
     )

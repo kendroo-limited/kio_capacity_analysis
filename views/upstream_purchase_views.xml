@@ -123,7 +123,7 @@
                             <field name="purchase_date"/>
                         </group>
                         <group string="Control">
-                            <field name="responsible_user_id"/>
+                            <field name="responsible_user_id" readonly="1"/>
                             <field name="active"/>
                         </group>
                     </group>

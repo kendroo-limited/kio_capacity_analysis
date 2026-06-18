@@ -30,6 +30,16 @@ class KioCapacityUpstreamPurchaseLine(models.Model):
         string="Price",
         default=0.0,
     )
+    total_price = fields.Float(
+        string="Total Price",
+        compute="_compute_total_price",
+        store=True,
+    )
+
+    @api.depends("purchased_capacity", "price")
+    def _compute_total_price(self):
+        for record in self:
+            record.total_price = record.purchased_capacity * record.price
 
     @api.constrains("purchased_capacity", "price")
     def _check_positive_values(self):

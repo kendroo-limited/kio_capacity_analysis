@@ -110,7 +110,8 @@
                                     <field name="sequence" widget="handle"/>
                                     <field name="capacity_item" placeholder="Internet Bandwidth"/>
                                     <field name="purchased_capacity" sum="Total Mbps"/>
-                                    <field name="price" sum="Total Price"/>
+                                    <field name="price"/>
+                                    <field name="total_price" sum="Total Price" readonly="1"/>
                                 </tree>
                             </field>
                         </page>

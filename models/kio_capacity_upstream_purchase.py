@@ -81,13 +81,14 @@ class KioCapacityUpstreamPurchase(models.Model):
         "line_ids.capacity_item",
         "line_ids.purchased_capacity",
         "line_ids.price",
+        "line_ids.total_price",
     )
     def _compute_line_totals(self):
         for record in self:
             items = [item for item in record.line_ids.mapped("capacity_item") if item]
             record.capacity_item = ", ".join(items) if items else ""
             record.purchased_capacity = sum(record.line_ids.mapped("purchased_capacity"))
-            record.price = sum(record.line_ids.mapped("price"))
+            record.price = sum(record.line_ids.mapped("total_price"))
 
     @api.depends("reference", "provider_id", "capacity_item", "purchased_capacity")
     def _compute_name(self):

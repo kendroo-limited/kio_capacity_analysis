@@ -246,10 +246,10 @@
               action="action_kio_capacity_upstream_purchase"
               sequence="20"/> -->
 
-    <menuitem id="menu_kio_capacity_configuration"
+    <!-- <menuitem id="menu_kio_capacity_configuration"
               name="Configuration"
               parent="menu_kio_capacity_root"
-              sequence="90"/>
+              sequence="90"/> -->
 
     <menuitem id="menu_kio_capacity_item"
               name="Capacity Items"

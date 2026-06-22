@@ -1,0 +1,361 @@
+/* Capacity Overview kanban dashboard */
+.o_action_manager:has(.kio_capacity_dashboard) .o_control_panel .o_cp_searchview,
+.o_action_manager:has(.kio_capacity_dashboard) .o_control_panel .o_searchview,
+.o_action_manager:has(.kio_capacity_dashboard) .o_control_panel .o_search_panel,
+.o_action_manager:has(.kio_capacity_dashboard) .o_control_panel .o_pager,
+.o_action_manager:has(.kio_capacity_dashboard) .o_control_panel .o_cp_pager,
+.o_action_manager:has(.kio_capacity_dashboard) .o_control_panel .o_cp_bottom {
+    display: none !important;
+}
+
+.o_action_manager:has(.kio_capacity_dashboard) .o_control_panel {
+    min-height: 44px !important;
+    padding-bottom: 0 !important;
+}
+
+.o_kanban_renderer.kio_capacity_dashboard {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    min-height: calc(100vh - 120px);
+    padding: 12px 32px 40px !important;
+    background: #f8fafc;
+}
+
+.kio_capacity_dashboard .o_kanban_record {
+    width: 100% !important;
+    max-width: 1480px !important;
+    flex: 0 0 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.kio_capacity_dashboard .o_kanban_record > div {
+    width: 100% !important;
+}
+
+.kio_capacity_dashboard .o_kanban_record:hover,
+.kio_capacity_dashboard .o_kanban_record:focus {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.kio_capacity_dashboard .o_kanban_record::before {
+    display: none !important;
+}
+
+.kio_capacity_shell {
+    width: 100%;
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 18px 10px 32px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #d8dee8;
+}
+
+.kio_capacity_header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 0 0 28px;
+}
+
+.kio_capacity_header_left {
+    min-width: 0;
+}
+
+.kio_capacity_breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    color: #7c3aed;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.kio_capacity_breadcrumb i {
+    color: #cbd5e1;
+    font-size: 10px;
+}
+
+.kio_capacity_breadcrumb_current {
+    color: #475569;
+    font-weight: 600;
+}
+
+.kio_capacity_title {
+    margin: 0 0 8px;
+    color: #071326;
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: 0;
+}
+
+.kio_capacity_subtitle {
+    margin: 0;
+    color: #64748b;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.kio_capacity_updated_badge {
+    margin-top: 26px;
+    min-width: 232px;
+    height: 44px;
+    padding: 0 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    color: #1e293b;
+    background: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.kio_capacity_updated_badge i {
+    color: #64748b;
+    font-size: 16px;
+}
+
+.kio_capacity_updated_time {
+    padding: 5px 12px;
+    border-radius: 16px;
+    color: #4f46e5;
+    background: #eef2ff;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.kio_capacity_grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.kio_capacity_card {
+    position: relative;
+    display: block;
+    min-height: 210px;
+    padding: 28px 26px 26px;
+    overflow: hidden;
+    color: inherit;
+    text-align: left;
+    text-decoration: none;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.kio_capacity_card:hover,
+.kio_capacity_card:focus {
+    color: inherit;
+    text-decoration: none;
+    transform: translateY(-2px);
+    border-color: rgba(203, 213, 225, 0.95);
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+    outline: none;
+}
+
+.kio_capacity_card_topline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+}
+
+.kio_capacity_card_blue .kio_capacity_card_topline {
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+}
+
+.kio_capacity_card_green .kio_capacity_card_topline {
+    background: linear-gradient(90deg, #16a34a, #4ade80);
+}
+
+.kio_capacity_card_cyan .kio_capacity_card_topline {
+    background: linear-gradient(90deg, #0891b2, #22d3ee);
+}
+
+.kio_capacity_card_purple .kio_capacity_card_topline {
+    background: linear-gradient(90deg, #7c3aed, #a78bfa);
+}
+
+.kio_capacity_card_orange .kio_capacity_card_topline {
+    background: linear-gradient(90deg, #d97706, #fbbf24);
+}
+
+.kio_capacity_card_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.kio_capacity_icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 24px;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+}
+
+.kio_capacity_icon_blue {
+    background: linear-gradient(135deg, #2563eb, #60a5fa);
+}
+
+.kio_capacity_icon_green {
+    background: linear-gradient(135deg, #16a34a, #4ade80);
+}
+
+.kio_capacity_icon_cyan {
+    background: linear-gradient(135deg, #0891b2, #22d3ee);
+}
+
+.kio_capacity_icon_purple {
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+}
+
+.kio_capacity_icon_orange {
+    background: linear-gradient(135deg, #d97706, #fbbf24);
+}
+
+.kio_capacity_status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px 6px 9px;
+    border-radius: 16px;
+    color: #475569;
+    background: #f1f5f9;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.kio_capacity_status_dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.kio_capacity_status_active,
+.kio_capacity_status_online {
+    background: #3b82f6;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.35);
+}
+
+.kio_capacity_status_available {
+    background: #22c55e;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.35);
+}
+
+.kio_capacity_status_warning {
+    background: #eab308;
+    box-shadow: 0 0 8px rgba(234, 179, 8, 0.35);
+}
+
+.kio_capacity_label {
+    margin-bottom: 10px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.kio_capacity_value_row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-height: 42px;
+}
+
+.kio_capacity_value {
+    color: #020617;
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.kio_capacity_unit {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+@media (max-width: 1400px) {
+    .kio_capacity_grid {
+        gap: 16px;
+    }
+
+    .kio_capacity_card {
+        min-height: 190px;
+        padding: 24px 20px 22px;
+    }
+
+    .kio_capacity_value {
+        font-size: 31px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .kio_capacity_grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .kio_capacity_header {
+        flex-direction: column;
+    }
+
+    .kio_capacity_updated_badge {
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .o_kanban_renderer.kio_capacity_dashboard {
+        padding: 12px !important;
+    }
+
+    .kio_capacity_shell {
+        padding: 16px 12px 24px;
+    }
+
+    .kio_capacity_grid {
+        grid-template-columns: 1fr;
+    }
+
+    .kio_capacity_title {
+        font-size: 27px;
+    }
+
+    .kio_capacity_card {
+        min-height: 172px;
+    }
+
+    .kio_capacity_updated_badge {
+        width: 100%;
+    }
+}

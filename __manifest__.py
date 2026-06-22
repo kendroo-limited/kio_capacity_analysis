@@ -23,6 +23,7 @@
             'kio_capacity_analysis/static/src/js/capacity_dashboard.js',
             'kio_capacity_analysis/static/src/xml/capacity_dashboard.xml',
             'kio_capacity_analysis/static/src/xml/vendor_comparison.xml',
+            'kio_capacity_analysis/static/src/scss/capacity_overview_dashboard.scss',
             'kio_capacity_analysis/static/src/scss/capacity_dashboard.scss',
         ],
     },

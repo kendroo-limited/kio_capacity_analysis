@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_template_form_view_inherit_upstream" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.upstream.service</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="priority" eval="25"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='detailed_type']" position="after">
+                <field name="is_upstream_service"
+                       string="Is Upstream Service"
+                       invisible="detailed_type != 'service'"
+                       required="detailed_type == 'service'"/>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

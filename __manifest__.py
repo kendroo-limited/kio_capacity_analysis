@@ -7,7 +7,7 @@
     'website': "https://www.yourcompany.com",
     'category': 'Operations',
     'version': '17.0.1.0.0',
-    'depends': ['base', 'web', 'mail'],
+    'depends': ['base', 'web', 'mail', 'product'],
     'data': [
         'security/ir.model.access.csv',
         'data/capacity_dashboard_data.xml',
@@ -16,6 +16,7 @@
         'views/views.xml',
         'views/upstream_purchase_views.xml',
         'views/capacity_dashboard_views.xml',
+        'views/product_template_views.xml',
     ],
     'assets': {
         'web.assets_backend': [

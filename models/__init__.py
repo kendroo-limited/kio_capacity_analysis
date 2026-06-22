@@ -6,3 +6,4 @@ from . import kio_capacity_dashboard_customer_line
 from . import kio_capacity_upstream_purchase
 from . import kio_capacity_upstream_purchase_line
 from . import kio_capacity_item
+from . import product_template

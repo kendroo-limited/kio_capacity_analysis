@@ -8,6 +8,7 @@ export class KioCapacityDashboard extends Component {
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
+
         this.state = useState({
             loading: true,
             summary: {
@@ -24,90 +25,99 @@ export class KioCapacityDashboard extends Component {
     }
 
     async loadDashboardData() {
-        const capacityItems = await this.orm.searchRead(
-            "kio.capacity.item",
-            [],
-            ["name", "active", "sequence"],
-            { context: { active_test: false } }
-        );
-        const purchaseLines = await this.orm.searchRead(
-            "kio.capacity.upstream.purchase.line",
-            [],
-            [
-                "capacity_item_id",
-                "purchased_capacity",
-                "price",
-                "total_price",
-                "purchase_id",
-            ],
-            { context: { active_test: false } }
-        );
-        const purchases = await this.orm.searchRead(
-            "kio.capacity.upstream.purchase",
-            [],
-            ["active"],
-            { context: { active_test: false } }
-        );
-        const activePurchaseIds = new Set(
-            purchases.filter((purchase) => purchase.active).map((purchase) => purchase.id)
-        );
+        this.state.loading = true;
 
-        const itemMap = new Map();
-        let totalActiveCapacity = 0;
-        let totalSpend = 0;
+        try {
+            const serviceProducts = await this.orm.searchRead(
+                "product.template",
+                [
+                    ["detailed_type", "=", "service"],
+                    ["is_upstream_service", "=", true],
+                ],
+                ["id", "name", "active", "is_upstream_service"],
+                { context: { active_test: false } }
+            );
 
-        for (const item of capacityItems) {
-            itemMap.set(item.id, {
-                itemId: item.id,
-                itemName: item.name,
-                active: item.active,
-                sequence: item.sequence || 10,
-                totalCapacity: 0,
-                totalPrice: 0,
-                purchaseCount: 0,
-            });
-        }
+            const purchaseLines = await this.orm.searchRead(
+                "kio.capacity.upstream.purchase.line",
+                [],
+                [
+                    "capacity_item_id",
+                    "purchased_capacity",
+                    "total_price",
+                    "purchase_id",
+                ],
+                { context: { active_test: false } }
+            );
 
-        for (const line of purchaseLines) {
-            const itemId = line.capacity_item_id ? line.capacity_item_id[0] : false;
-            const itemName = line.capacity_item_id ? line.capacity_item_id[1] : "No Capacity Item";
-            const mapKey = itemId || "no_item";
-            const capacity = line.purchased_capacity || 0;
-            const totalPrice = line.total_price || 0;
+            const purchases = await this.orm.searchRead(
+                "kio.capacity.upstream.purchase",
+                [],
+                ["id", "active"],
+                { context: { active_test: false } }
+            );
 
-            if (!itemMap.has(mapKey)) {
-                itemMap.set(mapKey, {
-                    itemId,
-                    itemName,
-                    active: false,
-                    sequence: 9999,
+            const activePurchaseIds = new Set(
+                purchases.filter((p) => p.active).map((p) => p.id)
+            );
+
+            const itemMap = new Map();
+            let totalActiveCapacity = 0;
+            let totalSpend = 0;
+
+            for (const product of serviceProducts) {
+                itemMap.set(product.id, {
+                    itemId: product.id,
+                    itemName: product.name,
+                    active: product.active,
                     totalCapacity: 0,
                     totalPrice: 0,
                     purchaseCount: 0,
                 });
             }
 
-            const item = itemMap.get(mapKey);
-            item.totalCapacity += capacity;
-            item.totalPrice += totalPrice;
-            item.purchaseCount += 1;
+            for (const line of purchaseLines) {
+                const capacityItemName = line.capacity_item_id
+                    ? line.capacity_item_id[1]
+                    : null;
 
-            if (line.purchase_id && activePurchaseIds.has(line.purchase_id[0])) {
-                totalActiveCapacity += capacity;
+                for (const item of itemMap.values()) {
+                    if (capacityItemName && capacityItemName === item.itemName) {
+                        const capacity = line.purchased_capacity || 0;
+                        const price = line.total_price || 0;
+
+                        item.totalCapacity += capacity;
+                        item.totalPrice += price;
+                        item.purchaseCount += 1;
+
+                        if (
+                            line.purchase_id &&
+                            activePurchaseIds.has(line.purchase_id[0])
+                        ) {
+                            totalActiveCapacity += capacity;
+                        }
+
+                        totalSpend += price;
+                        break;
+                    }
+                }
             }
 
-            totalSpend += totalPrice;
-        }
+            this.state.summary = {
+                totalActiveCapacity,
+                totalSpend,
+                totalCapacityItems: serviceProducts.length,
+            };
 
-        this.state.summary = {
-            totalActiveCapacity,
-            totalSpend,
-            totalCapacityItems: itemMap.size,
-        };
-        this.state.capacityItems = Array.from(itemMap.values()).sort((a, b) =>
-            (a.sequence - b.sequence) || a.itemName.localeCompare(b.itemName)
-        );
-        this.state.loading = false;
+            this.state.capacityItems = Array.from(itemMap.values()).sort((a, b) =>
+                a.itemName.localeCompare(b.itemName)
+            );
+        } catch (error) {
+            console.error("Dashboard Load Error:", error);
+            this.state.capacityItems = [];
+        } finally {
+            this.state.loading = false;
+        }
     }
 
     formatNumber(value) {
@@ -117,17 +127,15 @@ export class KioCapacityDashboard extends Component {
     }
 
     openCapacityItemPurchases(item) {
-        const domain = item.itemId
-            ? [["line_ids.capacity_item_id", "=", item.itemId]]
-            : [["line_ids.capacity_item_id", "=", false]];
-
         this.action.doAction({
             type: "ir.actions.act_window",
-            name: item.itemName,
+            name: `${item.itemName} - Purchases`,
             res_model: "kio.capacity.upstream.purchase",
-            views: [[false, "tree"], [false, "form"]],
-            view_mode: "tree,form",
-            domain,
+            views: [
+                [false, "tree"],
+                [false, "form"],
+            ],
+            domain: [["line_ids.capacity_item_id.name", "=", item.itemName]],
             context: { active_test: false },
             target: "current",
         });
@@ -136,17 +144,20 @@ export class KioCapacityDashboard extends Component {
     openCapacityItemForm() {
         this.action.doAction({
             type: "ir.actions.act_window",
-            name: "Capacity Item",
-            res_model: "kio.capacity.item",
+            name: "Create Upstream Service Product",
+            res_model: "product.template",
             views: [[false, "form"]],
-            view_mode: "form",
+            context: {
+                default_detailed_type: "service",
+                default_is_upstream_service: true,
+            },
             target: "current",
-            context: { active_test: false },
         });
     }
-
 }
 
 KioCapacityDashboard.template = "kio_capacity_analysis.CapacityDashboard";
 
-registry.category("actions").add("kio_capacity_analysis.capacity_dashboard", KioCapacityDashboard);
+registry
+    .category("actions")
+    .add("kio_capacity_analysis.capacity_dashboard", KioCapacityDashboard);

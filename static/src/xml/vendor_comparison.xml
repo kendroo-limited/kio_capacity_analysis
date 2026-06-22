@@ -129,7 +129,7 @@
                                     <td><t t-esc="formatNumber(state.comparisonSummary.totalCapacity)"/></td>
                                     <td>-</td>
                                     <td>-</td>
-                                    <td><t t-esc="formatNumber(state.comparisonSummary.averagePrice)"/></td>
+                                    <td>-</td>
                                     <td><t t-esc="formatNumber(state.comparisonSummary.totalSpend)"/></td>
                                     <td><t t-esc="state.comparisonSummary.totalPurchases"/></td>
                                     <td></td>

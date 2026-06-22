@@ -21,6 +21,16 @@ export class KioCapacityDashboard extends Component {
             capacityItems: [],
             dateFrom: currentMonthRange.dateFrom,
             dateTo: currentMonthRange.dateTo,
+            selectedItem: null,
+            comparisonLoading: false,
+            vendorRows: [],
+            comparisonSummary: {
+                totalActiveCapacity: 0,
+                totalCapacity: 0,
+                totalPurchases: 0,
+                totalSpend: 0,
+                averagePrice: 0,
+            },
         });
 
         onWillStart(async () => {
@@ -172,14 +182,22 @@ export class KioCapacityDashboard extends Component {
 
     async onDateRangeChange(field, value) {
         this.state[field] = value;
-        await this.loadDashboardData();
+        if (this.state.selectedItem) {
+            await this.loadVendorComparisonData();
+        } else {
+            await this.loadDashboardData();
+        }
     }
 
     async clearDateRange() {
         const currentMonthRange = this.getCurrentMonthRange();
         this.state.dateFrom = currentMonthRange.dateFrom;
         this.state.dateTo = currentMonthRange.dateTo;
-        await this.loadDashboardData();
+        if (this.state.selectedItem) {
+            await this.loadVendorComparisonData();
+        } else {
+            await this.loadDashboardData();
+        }
     }
 
     getInvoiceLineDomain(item) {
@@ -202,16 +220,185 @@ export class KioCapacityDashboard extends Component {
         return domain;
     }
 
-    openCapacityItemPurchases(item) {
+    getPurchaseDateDomain() {
+        const domain = [];
+        if (this.state.dateFrom) {
+            domain.push(["purchase_date", ">=", this.state.dateFrom]);
+        }
+        if (this.state.dateTo) {
+            domain.push(["purchase_date", "<=", this.state.dateTo]);
+        }
+        return domain;
+    }
+
+    getSelectedItemPurchaseDomain(vendorId = null) {
+        const domain = [
+            ["line_ids.capacity_item_id.name", "=", this.state.selectedItem.itemName],
+            ...this.getPurchaseDateDomain(),
+        ];
+        if (vendorId) {
+            domain.push(["provider_id", "=", vendorId]);
+        }
+        return domain;
+    }
+
+    getDisplayDate(value) {
+        return value || "-";
+    }
+
+    getVendorAveragePrice(row) {
+        return row.totalCapacity ? row.billAmount / row.totalCapacity : 0;
+    }
+
+    async openCapacityItemPurchases(item) {
+        this.state.selectedItem = item;
+        await this.loadVendorComparisonData();
+    }
+
+    backToDashboard() {
+        this.state.selectedItem = null;
+        this.state.vendorRows = [];
+        this.state.comparisonSummary = {
+            totalActiveCapacity: 0,
+            totalCapacity: 0,
+            totalPurchases: 0,
+            totalSpend: 0,
+            averagePrice: 0,
+        };
+    }
+
+    async loadVendorComparisonData() {
+        if (!this.state.selectedItem) {
+            return;
+        }
+
+        this.state.comparisonLoading = true;
+
+        try {
+            const purchases = await this.orm.searchRead(
+                "kio.capacity.upstream.purchase",
+                this.getSelectedItemPurchaseDomain(),
+                [
+                    "id",
+                    "active",
+                    "provider_id",
+                    "purchase_date",
+                    "contract_start_date",
+                    "contract_end_date",
+                ],
+                { context: { active_test: false } }
+            );
+
+            const purchaseIds = purchases.map((purchase) => purchase.id);
+            const purchaseMap = new Map(purchases.map((purchase) => [purchase.id, purchase]));
+            const lineDomain = purchaseIds.length
+                ? [
+                    ["purchase_id", "in", purchaseIds],
+                    ["capacity_item_id.name", "=", this.state.selectedItem.itemName],
+                ]
+                : [["id", "=", 0]];
+
+            const purchaseLines = await this.orm.searchRead(
+                "kio.capacity.upstream.purchase.line",
+                lineDomain,
+                ["purchase_id", "purchased_capacity", "price", "total_price"],
+                { context: { active_test: false } }
+            );
+
+            const vendorMap = new Map();
+            let totalActiveCapacity = 0;
+            let totalCapacity = 0;
+            let totalSpend = 0;
+            const totalPurchaseIds = new Set();
+
+            for (const line of purchaseLines) {
+                const purchaseId = line.purchase_id && line.purchase_id[0];
+                const purchase = purchaseMap.get(purchaseId);
+                if (!purchase) {
+                    continue;
+                }
+
+                const providerId = purchase.provider_id && purchase.provider_id[0];
+                const providerName = purchase.provider_id ? purchase.provider_id[1] : "No Vendor";
+                const vendorKey = providerId || `no_vendor_${purchaseId}`;
+                const capacity = line.purchased_capacity || 0;
+                const amount = line.total_price || 0;
+
+                if (!vendorMap.has(vendorKey)) {
+                    vendorMap.set(vendorKey, {
+                        vendorId: providerId,
+                        vendorName: providerName,
+                        totalCapacity: 0,
+                        billAmount: 0,
+                        purchaseIds: new Set(),
+                        startDate: purchase.contract_start_date || purchase.purchase_date || null,
+                        endDate: purchase.contract_end_date || purchase.purchase_date || null,
+                    });
+                }
+
+                const row = vendorMap.get(vendorKey);
+                row.totalCapacity += capacity;
+                row.billAmount += amount;
+                row.purchaseIds.add(purchaseId);
+
+                const startDate = purchase.contract_start_date || purchase.purchase_date;
+                const endDate = purchase.contract_end_date || purchase.purchase_date;
+                if (startDate && (!row.startDate || startDate < row.startDate)) {
+                    row.startDate = startDate;
+                }
+                if (endDate && (!row.endDate || endDate > row.endDate)) {
+                    row.endDate = endDate;
+                }
+
+                totalCapacity += capacity;
+                if (purchase.active) {
+                    totalActiveCapacity += capacity;
+                }
+                totalSpend += amount;
+                totalPurchaseIds.add(purchaseId);
+            }
+
+            const vendorRows = Array.from(vendorMap.values())
+                .map((row) => ({
+                    ...row,
+                    purchaseCount: row.purchaseIds.size,
+                    averagePrice: this.getVendorAveragePrice(row),
+                }))
+                .sort((a, b) => a.vendorName.localeCompare(b.vendorName));
+
+            this.state.vendorRows = vendorRows;
+            this.state.comparisonSummary = {
+                totalActiveCapacity,
+                totalCapacity,
+                totalPurchases: totalPurchaseIds.size,
+                totalSpend,
+                averagePrice: totalCapacity ? totalSpend / totalCapacity : 0,
+            };
+        } catch (error) {
+            console.error("Vendor Comparison Load Error:", error);
+            this.state.vendorRows = [];
+            this.state.comparisonSummary = {
+                totalActiveCapacity: 0,
+                totalCapacity: 0,
+                totalPurchases: 0,
+                totalSpend: 0,
+                averagePrice: 0,
+            };
+        } finally {
+            this.state.comparisonLoading = false;
+        }
+    }
+
+    openVendorPurchases(row) {
         this.action.doAction({
             type: "ir.actions.act_window",
-            name: `${item.itemName} - Vendor Bill Lines`,
-            res_model: "account.move.line",
+            name: `${this.state.selectedItem.itemName} - ${row.vendorName} Purchases`,
+            res_model: "kio.capacity.upstream.purchase",
             views: [
                 [false, "tree"],
                 [false, "form"],
             ],
-            domain: this.getInvoiceLineDomain(item),
+            domain: this.getSelectedItemPurchaseDomain(row.vendorId),
             context: { active_test: false },
             target: "current",
         });

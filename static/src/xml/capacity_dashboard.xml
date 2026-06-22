@@ -12,6 +12,10 @@
                 </div>
             </div>
 
+            <t t-if="state.selectedItem">
+                <t t-call="kio_capacity_analysis.VendorComparisonPage"/>
+            </t>
+            <t t-else="">
             <div class="kio_upstream_page">
                 <div class="kio_upstream_header">
                     <div class="kio_upstream_header_center">
@@ -117,6 +121,7 @@
                     </t>
                 </t>
             </div>
+            </t>
         </div>
     </t>
 </templates>

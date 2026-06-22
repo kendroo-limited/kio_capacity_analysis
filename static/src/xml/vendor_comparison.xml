@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="kio_capacity_analysis.VendorComparisonPage">
+        <div class="kio_upstream_page kio_upstream_compare_page">
+            <div class="kio_upstream_compare_topbar">
+                <button type="button" class="btn kio_upstream_back_btn" t-on-click="() => this.backToDashboard()">
+                    <span aria-hidden="true">&#8592;</span> Back to Dashboard
+                </button>
+                <div class="kio_upstream_date_filter kio_upstream_compare_date_filter" aria-label="Date range filter">
+                    <div class="kio_upstream_date_field">
+                        <label class="kio_upstream_date_label" for="comparison_date_from">Start Date</label>
+                        <input id="comparison_date_from" type="date" class="form-control kio_upstream_date_input" t-att-value="state.dateFrom" t-on-change="(ev) => this.onDateRangeChange('dateFrom', ev.target.value)"/>
+                    </div>
+                    <div class="kio_upstream_date_field">
+                        <label class="kio_upstream_date_label" for="comparison_date_to">End Date</label>
+                        <input id="comparison_date_to" type="date" class="form-control kio_upstream_date_input" t-att-value="state.dateTo" t-on-change="(ev) => this.onDateRangeChange('dateTo', ev.target.value)"/>
+                    </div>
+                    <button type="button" class="btn kio_upstream_clear_btn" t-on-click="() => this.clearDateRange()">
+                        Clear
+                    </button>
+                </div>
+            </div>
+
+            <div class="kio_upstream_compare_header">
+                <div class="kio_upstream_compare_identity">
+                    <div class="kio_upstream_compare_icon">
+                        <i class="fa fa-server"/>
+                    </div>
+                    <div>
+                        <div class="kio_upstream_compare_eyebrow">Capacity Item</div>
+                        <h2 class="kio_upstream_compare_title" t-esc="state.selectedItem.itemName"/>
+                        <div class="kio_upstream_compare_subtitle">Compare vendors for this capacity item</div>
+                    </div>
+                </div>
+                <span t-att-class="state.selectedItem.active ? 'kio_upstream_status_badge kio_upstream_status_active' : 'kio_upstream_status_badge kio_upstream_status_archived'">
+                    <t t-esc="state.selectedItem.active ? 'Active' : 'Archived'"/>
+                </span>
+            </div>
+
+            <t t-if="state.comparisonLoading">
+                <div class="kio_upstream_loading">Loading vendor comparison...</div>
+            </t>
+
+            <t t-else="">
+                <div class="kio_upstream_compare_kpi_grid">
+                    <div class="kio_upstream_compare_kpi kio_upstream_compare_kpi_purple">
+                        <div class="kio_upstream_compare_kpi_icon"><i class="fa fa-tachometer"/></div>
+                        <div>
+                            <div class="kio_upstream_compare_kpi_label">Total Active Capacity</div>
+                            <div class="kio_upstream_compare_kpi_value"><t t-esc="formatNumber(state.comparisonSummary.totalActiveCapacity)"/> Mbps</div>
+                        </div>
+                    </div>
+                    <div class="kio_upstream_compare_kpi kio_upstream_compare_kpi_blue">
+                        <div class="kio_upstream_compare_kpi_icon"><i class="fa fa-shopping-cart"/></div>
+                        <div>
+                            <div class="kio_upstream_compare_kpi_label">Total Purchases</div>
+                            <div class="kio_upstream_compare_kpi_value"><t t-esc="state.comparisonSummary.totalPurchases"/></div>
+                        </div>
+                    </div>
+                    <div class="kio_upstream_compare_kpi kio_upstream_compare_kpi_green">
+                        <div class="kio_upstream_compare_kpi_icon"><i class="fa fa-money"/></div>
+                        <div>
+                            <div class="kio_upstream_compare_kpi_label">Total Spend / Bill Amount</div>
+                            <div class="kio_upstream_compare_kpi_value"><t t-esc="formatNumber(state.comparisonSummary.totalSpend)"/></div>
+                        </div>
+                    </div>
+                    <div class="kio_upstream_compare_kpi kio_upstream_compare_kpi_sky">
+                        <div class="kio_upstream_compare_kpi_icon"><i class="fa fa-line-chart"/></div>
+                        <div>
+                            <div class="kio_upstream_compare_kpi_label">Average Price per Mbps</div>
+                            <div class="kio_upstream_compare_kpi_value"><t t-esc="formatNumber(state.comparisonSummary.averagePrice)"/></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kio_upstream_compare_section_head">
+                    <h3>Vendor Comparison</h3>
+                    <span><t t-esc="state.vendorRows.length"/> vendors</span>
+                </div>
+
+                <div class="kio_upstream_compare_table_card">
+                    <div class="table-responsive">
+                        <table class="table kio_upstream_compare_table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Vendor</th>
+                                    <th>Total Capacity (Mbps)</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Price (per Mbps)</th>
+                                    <th>Bill Amount</th>
+                                    <th>Purchases</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.vendorRows" t-as="row" t-key="row.vendorId || row.vendorName">
+                                    <tr>
+                                        <td><t t-esc="row_index + 1"/></td>
+                                        <td>
+                                            <div class="kio_upstream_vendor_cell">
+                                                <span class="kio_upstream_vendor_avatar"><t t-esc="row.vendorName.slice(0, 1)"/></span>
+                                                <span t-esc="row.vendorName"/>
+                                            </div>
+                                        </td>
+                                        <td><t t-esc="formatNumber(row.totalCapacity)"/></td>
+                                        <td><t t-esc="getDisplayDate(row.startDate)"/></td>
+                                        <td><t t-esc="getDisplayDate(row.endDate)"/></td>
+                                        <td><t t-esc="formatNumber(row.averagePrice)"/></td>
+                                        <td><t t-esc="formatNumber(row.billAmount)"/></td>
+                                        <td><t t-esc="row.purchaseCount"/></td>
+                                        <td>
+                                            <button type="button" class="btn kio_upstream_table_action" t-on-click.stop="() => this.openVendorPurchases(row)">
+                                                View Purchases
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </t>
+                                <t t-if="!state.vendorRows.length">
+                                    <tr>
+                                        <td colspan="9" class="kio_upstream_compare_empty">No vendor purchases found for this date range.</td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                            <tfoot t-if="state.vendorRows.length">
+                                <tr>
+                                    <td colspan="2">Total / Average</td>
+                                    <td><t t-esc="formatNumber(state.comparisonSummary.totalCapacity)"/></td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td><t t-esc="formatNumber(state.comparisonSummary.averagePrice)"/></td>
+                                    <td><t t-esc="formatNumber(state.comparisonSummary.totalSpend)"/></td>
+                                    <td><t t-esc="state.comparisonSummary.totalPurchases"/></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="kio_upstream_compare_info">
+                    <i class="fa fa-info-circle"/>
+                    <span>Prices are calculated based on bill amount and total capacity for the selected date range.</span>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

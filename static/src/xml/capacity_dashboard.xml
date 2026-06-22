@@ -8,15 +8,15 @@
                 </button>
                 <div class="d-inline-block">
                     <h2 class="mb-1">Upstream Capacity Dashboard</h2>
-                    <div class="text-muted">Upstream capacity grouped by capacity item</div>
+                    <div class="text-muted">Vendor bill quantity grouped by service product</div>
                 </div>
                 <div class="position-absolute end-0 top-0 d-flex align-items-end gap-2 text-start">
                     <div>
-                        <label class="form-label mb-1" for="capacity_date_from">From Date</label>
+                        <label class="form-label mb-1" for="capacity_date_from">Start Date</label>
                         <input id="capacity_date_from" type="date" class="form-control" t-att-value="state.dateFrom" t-on-change="(ev) => this.onDateRangeChange('dateFrom', ev.target.value)"/>
                     </div>
                     <div>
-                        <label class="form-label mb-1" for="capacity_date_to">To Date</label>
+                        <label class="form-label mb-1" for="capacity_date_to">End Date</label>
                         <input id="capacity_date_to" type="date" class="form-control" t-att-value="state.dateTo" t-on-change="(ev) => this.onDateRangeChange('dateTo', ev.target.value)"/>
                     </div>
                     <button type="button" class="btn btn-outline-secondary" t-att-disabled="!state.dateFrom &amp;&amp; !state.dateTo" t-on-click="() => this.clearDateRange()">
@@ -34,7 +34,7 @@
                     <div class="col-md-3">
                         <div class="card h-100">
                             <div class="card-body">
-                                <div class="text-muted mb-1">Total Active Capacity</div>
+                                <div class="text-muted mb-1">Total Vendor Bill Quantity</div>
                                 <h3 class="mb-0">
                                     <t t-esc="formatNumber(state.summary.totalActiveCapacity)"/> Mbps
                                 </h3>
@@ -54,7 +54,7 @@
                     <div class="col-md-3">
                         <div class="card h-100">
                             <div class="card-body">
-                                <div class="text-muted mb-1">Total Capacity Items</div>
+                                <div class="text-muted mb-1">Service Products</div>
                                 <h3 class="mb-0">
                                     <t t-esc="state.summary.totalCapacityItems"/>
                                 </h3>
@@ -76,28 +76,28 @@
                                     </div>
 
                                     <div class="mb-2">
-                                        <div class="text-muted">Total Capacity</div>
+                                        <div class="text-muted">Sales Quantity</div>
                                         <div class="fs-4 fw-semibold">
                                             <t t-esc="formatNumber(item.totalCapacity)"/> Mbps
                                         </div>
                                     </div>
 
                                     <div class="mb-2">
-                                        <div class="text-muted">Total Price</div>
+                                        <div class="text-muted">Vendor Bill Amount</div>
                                         <div class="fs-5">
                                             <t t-esc="formatNumber(item.totalPrice)"/>
                                         </div>
                                     </div>
 
                                     <div class="mb-3">
-                                        <div class="text-muted">Purchases</div>
+                                        <div class="text-muted">Vendor Bill Lines</div>
                                         <div class="fs-6">
                                             <t t-esc="item.purchaseCount"/>
                                         </div>
                                     </div>
 
                                     <button type="button" class="btn btn-primary mt-auto" t-on-click="() => this.openCapacityItemPurchases(item)">
-                                        View Purchases
+                                        View Vendor Bill Lines
                                     </button>
                                 </div>
                             </div>

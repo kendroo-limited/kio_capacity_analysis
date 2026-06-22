@@ -30,12 +30,16 @@ export class KioCapacityDashboard extends Component {
         this.state.loading = true;
 
         try {
-            const purchaseDomain = [];
+            const invoiceLineDomain = [
+                ["move_id.move_type", "=", "in_invoice"],
+                ["move_id.state", "!=", "cancel"],
+                ["display_type", "=", "product"],
+            ];
             if (this.state.dateFrom) {
-                purchaseDomain.push(["purchase_date", ">=", this.state.dateFrom]);
+                invoiceLineDomain.push(["move_id.invoice_date", ">=", this.state.dateFrom]);
             }
             if (this.state.dateTo) {
-                purchaseDomain.push(["purchase_date", "<=", this.state.dateTo]);
+                invoiceLineDomain.push(["move_id.invoice_date", "<=", this.state.dateTo]);
             }
 
             const serviceProducts = await this.orm.searchRead(
@@ -48,79 +52,87 @@ export class KioCapacityDashboard extends Component {
                 { context: { active_test: false } }
             );
 
-            const purchases = await this.orm.searchRead(
-                "kio.capacity.upstream.purchase",
-                purchaseDomain,
-                ["id", "active"],
-                { context: { active_test: false } }
-            );
+            const templateIds = serviceProducts.map((product) => product.id);
+            const productVariants = templateIds.length
+                ? await this.orm.searchRead(
+                    "product.product",
+                    [["product_tmpl_id", "in", templateIds]],
+                    ["id", "product_tmpl_id"],
+                    { context: { active_test: false } }
+                )
+                : [];
 
-            const purchaseIds = purchases.map((p) => p.id);
-            const purchaseLineDomain = purchaseIds.length
-                ? [["purchase_id", "in", purchaseIds]]
-                : [["id", "=", 0]];
+            const variantToTemplate = new Map();
+            const templateToVariants = new Map();
+            for (const variant of productVariants) {
+                const templateId = variant.product_tmpl_id && variant.product_tmpl_id[0];
+                if (!templateId) {
+                    continue;
+                }
+                variantToTemplate.set(variant.id, templateId);
+                if (!templateToVariants.has(templateId)) {
+                    templateToVariants.set(templateId, []);
+                }
+                templateToVariants.get(templateId).push(variant.id);
+            }
 
-            const purchaseLines = await this.orm.searchRead(
-                "kio.capacity.upstream.purchase.line",
-                purchaseLineDomain,
+            const variantIds = productVariants.map((variant) => variant.id);
+            if (variantIds.length) {
+                invoiceLineDomain.push(["product_id", "in", variantIds]);
+            } else {
+                invoiceLineDomain.push(["id", "=", 0]);
+            }
+
+            const invoiceLines = await this.orm.searchRead(
+                "account.move.line",
+                invoiceLineDomain,
                 [
-                    "capacity_item_id",
-                    "purchased_capacity",
-                    "total_price",
-                    "purchase_id",
+                    "product_id",
+                    "quantity",
+                    "price_subtotal",
+                    "move_id",
+                    "partner_id",
                 ],
                 { context: { active_test: false } }
             );
 
-            const activePurchaseIds = new Set(
-                purchases.filter((p) => p.active).map((p) => p.id)
-            );
-
             const itemMap = new Map();
-            let totalActiveCapacity = 0;
-            let totalSpend = 0;
+            let totalSalesQuantity = 0;
+            let totalInvoiceAmount = 0;
 
             for (const product of serviceProducts) {
                 itemMap.set(product.id, {
                     itemId: product.id,
                     itemName: product.name,
                     active: product.active,
+                    variantIds: templateToVariants.get(product.id) || [],
                     totalCapacity: 0,
                     totalPrice: 0,
                     purchaseCount: 0,
                 });
             }
 
-            for (const line of purchaseLines) {
-                const capacityItemName = line.capacity_item_id
-                    ? line.capacity_item_id[1]
-                    : null;
-
-                for (const item of itemMap.values()) {
-                    if (capacityItemName && capacityItemName === item.itemName) {
-                        const capacity = line.purchased_capacity || 0;
-                        const price = line.total_price || 0;
-
-                        item.totalCapacity += capacity;
-                        item.totalPrice += price;
-                        item.purchaseCount += 1;
-
-                        if (
-                            line.purchase_id &&
-                            activePurchaseIds.has(line.purchase_id[0])
-                        ) {
-                            totalActiveCapacity += capacity;
-                        }
-
-                        totalSpend += price;
-                        break;
-                    }
+            for (const line of invoiceLines) {
+                const variantId = line.product_id && line.product_id[0];
+                const templateId = variantToTemplate.get(variantId);
+                const item = itemMap.get(templateId);
+                if (!item) {
+                    continue;
                 }
+
+                const quantity = line.quantity || 0;
+                const amount = line.price_subtotal || 0;
+
+                item.totalCapacity += quantity;
+                item.totalPrice += amount;
+                item.purchaseCount += 1;
+                totalSalesQuantity += quantity;
+                totalInvoiceAmount += amount;
             }
 
             this.state.summary = {
-                totalActiveCapacity,
-                totalSpend,
+                totalActiveCapacity: totalSalesQuantity,
+                totalSpend: totalInvoiceAmount,
                 totalCapacityItems: serviceProducts.length,
             };
 
@@ -152,13 +164,22 @@ export class KioCapacityDashboard extends Component {
         await this.loadDashboardData();
     }
 
-    getPurchaseDomain(item) {
-        const domain = [["line_ids.capacity_item_id.name", "=", item.itemName]];
+    getInvoiceLineDomain(item) {
+        const domain = [
+            ["move_id.move_type", "=", "in_invoice"],
+            ["move_id.state", "!=", "cancel"],
+            ["display_type", "=", "product"],
+        ];
+        if (item.variantIds && item.variantIds.length) {
+            domain.push(["product_id", "in", item.variantIds]);
+        } else {
+            domain.push(["id", "=", 0]);
+        }
         if (this.state.dateFrom) {
-            domain.push(["purchase_date", ">=", this.state.dateFrom]);
+            domain.push(["move_id.invoice_date", ">=", this.state.dateFrom]);
         }
         if (this.state.dateTo) {
-            domain.push(["purchase_date", "<=", this.state.dateTo]);
+            domain.push(["move_id.invoice_date", "<=", this.state.dateTo]);
         }
         return domain;
     }
@@ -166,13 +187,13 @@ export class KioCapacityDashboard extends Component {
     openCapacityItemPurchases(item) {
         this.action.doAction({
             type: "ir.actions.act_window",
-            name: `${item.itemName} - Purchases`,
-            res_model: "kio.capacity.upstream.purchase",
+            name: `${item.itemName} - Vendor Bill Lines`,
+            res_model: "account.move.line",
             views: [
                 [false, "tree"],
                 [false, "form"],
             ],
-            domain: this.getPurchaseDomain(item),
+            domain: this.getInvoiceLineDomain(item),
             context: { active_test: false },
             target: "current",
         });

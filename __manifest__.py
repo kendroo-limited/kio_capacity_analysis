@@ -7,7 +7,7 @@
     'website': "https://www.yourcompany.com",
     'category': 'Operations',
     'version': '17.0.1.0.0',
-    'depends': ['base', 'web', 'mail', 'product'],
+    'depends': ['base', 'web', 'mail', 'product', 'account'],
     'data': [
         'security/ir.model.access.csv',
         'data/capacity_dashboard_data.xml',

@@ -854,3 +854,30 @@
         justify-content: stretch;
     }
 }
+
+/* Vertical scroll for full upstream capacity dashboard page */
+.o_kio_capacity_client_dashboard.kio_upstream_dashboard {
+    height: calc(100vh - 46px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #100a1a #eef2f7;
+}
+
+.o_kio_capacity_client_dashboard.kio_upstream_dashboard::-webkit-scrollbar {
+    width: 8px;
+}
+
+.o_kio_capacity_client_dashboard.kio_upstream_dashboard::-webkit-scrollbar-track {
+    background: #eef2f7;
+    border-radius: 999px;
+}
+
+.o_kio_capacity_client_dashboard.kio_upstream_dashboard::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #7c3aed, #a855f7);
+    border-radius: 999px;
+}
+
+.o_kio_capacity_client_dashboard.kio_upstream_dashboard::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #6d28d9, #9333ea);
+}

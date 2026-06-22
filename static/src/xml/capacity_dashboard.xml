@@ -68,7 +68,7 @@
 
                     <div class="kio_upstream_card_grid">
                         <t t-foreach="state.capacityItems" t-as="item" t-key="item.itemId || item.itemName">
-                            <div class="kio_upstream_item_card">
+                            <div class="kio_upstream_item_card" role="button" tabindex="0" t-on-click="() => this.openCapacityItemPurchases(item)">
                                 <div class="kio_upstream_item_header">
                                     <div class="kio_upstream_item_identity">
                                         <div class="kio_upstream_item_icon">
@@ -108,9 +108,6 @@
                                     </div>
                                 </div>
 
-                                <button type="button" class="btn kio_upstream_view_btn" t-on-click="() => this.openCapacityItemPurchases(item)">
-                                    View Purchases <span aria-hidden="true">&#8594;</span>
-                                </button>
                             </div>
                         </t>
                     </div>

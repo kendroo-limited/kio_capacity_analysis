@@ -53,7 +53,7 @@
                     <div class="kio_upstream_compare_kpi kio_upstream_compare_kpi_blue">
                         <div class="kio_upstream_compare_kpi_icon"><i class="fa fa-shopping-cart"/></div>
                         <div>
-                            <div class="kio_upstream_compare_kpi_label">Total Purchases</div>
+                            <div class="kio_upstream_compare_kpi_label">Total Vendor Bills</div>
                             <div class="kio_upstream_compare_kpi_value"><t t-esc="state.comparisonSummary.totalPurchases"/></div>
                         </div>
                     </div>
@@ -90,7 +90,7 @@
                                     <th>End Date</th>
                                     <th>Price (per Mbps)</th>
                                     <th>Bill Amount</th>
-                                    <th>Purchases</th>
+                                    <th>Bills</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -112,14 +112,14 @@
                                         <td><t t-esc="row.purchaseCount"/></td>
                                         <td>
                                             <button type="button" class="btn kio_upstream_table_action" t-on-click.stop="() => this.openVendorPurchases(row)">
-                                                View Purchases
+                                                View Vendor Bills
                                             </button>
                                         </td>
                                     </tr>
                                 </t>
                                 <t t-if="!state.vendorRows.length">
                                     <tr>
-                                        <td colspan="9" class="kio_upstream_compare_empty">No vendor purchases found for this date range.</td>
+                                        <td colspan="9" class="kio_upstream_compare_empty">No vendor bills found for this date range.</td>
                                     </tr>
                                 </t>
                             </tbody>

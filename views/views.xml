@@ -21,13 +21,13 @@
                         <div class="kio_capacity_shell">
                             <div class="kio_capacity_header">
                                 <div class="kio_capacity_header_left">
-                                    <div class="kio_capacity_breadcrumb">
+                                    <!-- <div class="kio_capacity_breadcrumb">
                                         <span>Home</span>
                                         <i class="fa fa-chevron-right"/>
                                         <span>Capacity Analysis</span>
                                         <i class="fa fa-chevron-right"/>
                                         <span class="kio_capacity_breadcrumb_current">Dashboard</span>
-                                    </div>
+                                    </div> -->
                                     <h1 class="kio_capacity_title">Capacity Overview</h1>
                                     <p class="kio_capacity_subtitle">Real-time resource utilization and capacity metrics</p>
                                 </div>

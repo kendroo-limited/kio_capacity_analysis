@@ -227,13 +227,16 @@
     <menuitem id="menu_kio_capacity_root"
               name="Capacity Analysis"
               web_icon="kio_capacity_analysis,static/description/icon.png"
-              sequence="10"/>
-
-    <menuitem id="menu_kio_capacity_dashboard"
-              name="Dashboard"
-              parent="menu_kio_capacity_root"
               action="action_kio_capacity_dashboard"
               sequence="10"/>
+
+    <!-- Keep the historical XML ID but hide the child menu so the root menu opens the dashboard directly. -->
+    <record id="menu_kio_capacity_dashboard" model="ir.ui.menu">
+        <field name="name">Dashboard</field>
+        <field name="parent_id" ref="menu_kio_capacity_root"/>
+        <field name="sequence">10</field>
+        <field name="active" eval="False"/>
+    </record>
 
 
 </odoo>

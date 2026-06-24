@@ -88,7 +88,7 @@
                         </div>
 
                         <div class="kio_downstream_card_grid">
-                            <t t-foreach="state.packages" t-as="packageRow" t-key="packageRow.packageId">
+                            <t t-foreach="state.packages" t-as="packageRow" t-key="packageRow.packageId || packageRow.packageName">
                                 <div class="kio_downstream_item_card" role="button" tabindex="0" t-on-click="() => this.openPackage(packageRow)">
                                     <div class="kio_downstream_item_header">
                                         <div class="kio_downstream_item_identity">
@@ -97,7 +97,7 @@
                                             </div>
                                             <div>
                                                 <h5 class="kio_downstream_item_name" t-esc="packageRow.packageName"/>
-                                                <div class="kio_downstream_item_hint">Customer Package</div>
+                                                <div class="kio_downstream_item_hint">Capacity item</div>
                                             </div>
                                         </div>
                                         <span t-att-class="packageRow.active ? 'kio_downstream_status_badge kio_downstream_status_active' : 'kio_downstream_status_badge kio_downstream_status_archived'">

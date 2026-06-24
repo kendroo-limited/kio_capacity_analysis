@@ -168,6 +168,35 @@ class KioCapacityDashboard(models.Model):
     def get_total_active_upstream_capacity(self, date_from=False, date_to=False):
         return self._get_total_active_upstream_capacity(date_from=date_from, date_to=date_to)
 
+    @api.model
+    def _get_downstream_customer_invoice_line_domain(self, date_from=False, date_to=False):
+        domain = [
+            ("move_id.move_type", "=", "out_invoice"),
+            ("move_id.state", "!=", "cancel"),
+            ("product_id.product_tmpl_id.detailed_type", "=", "service"),
+            ("product_id.product_tmpl_id.is_upstream_service", "=", True),
+        ]
+        if date_from:
+            domain.append(("move_id.invoice_date", ">=", date_from))
+        if date_to:
+            domain.append(("move_id.invoice_date", "<=", date_to))
+        return domain
+
+    @api.model
+    def _get_total_active_downstream_capacity(self, date_from=False, date_to=False):
+        grouped_capacity = self.env["account.move.line"].sudo().read_group(
+            self._get_downstream_customer_invoice_line_domain(date_from=date_from, date_to=date_to),
+            ["quantity:sum"],
+            [],
+        )
+        if not grouped_capacity:
+            return 0.0
+        return grouped_capacity[0].get("quantity", 0.0) or 0.0
+
+    @api.model
+    def get_total_active_downstream_capacity(self, date_from=False, date_to=False):
+        return self._get_total_active_downstream_capacity(date_from=date_from, date_to=date_to)
+
     def _get_first_existing_field(self, model, field_names):
         for field_name in field_names:
             if field_name in model._fields:
@@ -345,7 +374,15 @@ class KioCapacityDashboard(models.Model):
     @api.depends_context("uid")
     def _compute_realtime_capacity(self):
         Client = self.env["isp.client"].sudo()
-        total_upstream_capacity = self._get_total_upstream_capacity()
+        date_from, date_to = self._get_default_upstream_capacity_date_range()
+        total_upstream_capacity = self._get_total_active_upstream_capacity(
+            date_from=date_from,
+            date_to=date_to,
+        )
+        total_downstream_capacity = self._get_total_active_downstream_capacity(
+            date_from=date_from,
+            date_to=date_to,
+        )
 
         active_bandwidth_clients = Client.search([
             ("active", "=", True),
@@ -395,10 +432,10 @@ class KioCapacityDashboard(models.Model):
 
         for dashboard in self:
             dashboard.total_upstream_capacity = total_upstream_capacity
-            dashboard.total_capacity = total_final_capacity
-            dashboard.bandwidth_capacity = total_final_capacity
+            dashboard.total_capacity = total_downstream_capacity
+            dashboard.bandwidth_capacity = total_downstream_capacity
             dashboard.mac_capacity = 0.0
-            dashboard.free_capacity = 0.0
+            dashboard.free_capacity = max(total_upstream_capacity - total_downstream_capacity, 0.0)
             dashboard.upgrade_capacity = total_upgrade_capacity
             dashboard.downgrade_capacity = total_downgrade_capacity
 
